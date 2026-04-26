@@ -1,6 +1,8 @@
-// Detecta automáticamente si corre en APK (Capacitor) o en navegador local
+// Detecta si corre en APK (file://) o en navegador local (http://localhost)
 (function () {
-    var isApk = window.location.protocol === 'capacitor:' ||
+    var proto = window.location.protocol;
+    var isApk = proto === 'file:' ||
+                proto === 'capacitor:' ||
                 typeof window.Capacitor !== 'undefined';
 
     // En APK → usa la IP del servidor real

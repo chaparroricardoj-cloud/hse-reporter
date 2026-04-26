@@ -33,7 +33,8 @@ public class MainActivity extends Activity {
 
         webView.setWebViewClient(new WebViewClient());
         webView.setWebChromeClient(new WebChromeClient());
-        webView.loadUrl(SERVER_URL);
+        // Carga los archivos desde dentro del APK (assets/)
+        webView.loadUrl("file:///android_asset/index.html");
     }
 
     @Override

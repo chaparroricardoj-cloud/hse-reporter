@@ -40,6 +40,19 @@ jobs:
         with:
           gradle-version: '8.4'
 
+      # Copiar archivos web dentro del APK (assets)
+      - name: Copy web assets into APK
+        run: |
+          mkdir -p hse-app/android-app/app/src/main/assets
+          cp hse-app/index.html   hse-app/android-app/app/src/main/assets/
+          cp hse-app/styles.css   hse-app/android-app/app/src/main/assets/
+          cp hse-app/app.js       hse-app/android-app/app/src/main/assets/
+          cp hse-app/config.js    hse-app/android-app/app/src/main/assets/
+          cp hse-app/admin.html   hse-app/android-app/app/src/main/assets/
+          cp hse-app/admin.css    hse-app/android-app/app/src/main/assets/
+          cp hse-app/admin.js     hse-app/android-app/app/src/main/assets/
+          cp hse-app/manifest.json hse-app/android-app/app/src/main/assets/
+
       - name: Build Debug APK
         working-directory: hse-app/android-app
         run: gradle assembleDebug --stacktrace
