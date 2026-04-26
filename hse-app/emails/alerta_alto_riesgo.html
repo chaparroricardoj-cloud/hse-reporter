@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alerta Riesgo ALTO — HSE Reporter</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f2f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;">
+
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0f2f5;padding:30px 0;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+
+          <!-- ENCABEZADO ROJO -->
+          <tr>
+            <td style="background:#e74c3c;border-radius:12px 12px 0 0;padding:28px 32px;text-align:center;">
+              <div style="font-size:48px;margin-bottom:8px;">🚨</div>
+              <h1 style="color:white;margin:0;font-size:24px;font-weight:800;letter-spacing:0.5px;">
+                ALERTA — RIESGO ALTO
+              </h1>
+              <p style="color:rgba(255,255,255,0.85);margin:8px 0 0;font-size:15px;">
+                Se registró un incidente que requiere atención inmediata
+              </p>
+            </td>
+          </tr>
+
+          <!-- CUERPO -->
+          <tr>
+            <td style="background:white;padding:32px;">
+
+              <!-- ID y timestamp -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+                <tr>
+                  <td style="background:#fff5f5;border:1px solid #fecaca;border-radius:8px;padding:14px 18px;">
+                    <span style="font-size:13px;color:#9b1c1c;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Reporte</span>
+                    <span style="font-size:18px;font-weight:800;color:#e74c3c;margin-left:10px;">{{ID}}</span>
+                    <span style="float:right;font-size:13px;color:#9b1c1c;">{{FECHA_HORA}}</span>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Datos del reporte -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-bottom:24px;">
+
+                <tr>
+                  <td style="padding:12px 0;border-bottom:1px solid #f3f4f6;width:38%;vertical-align:top;">
+                    <span style="font-size:13px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;">Tipo</span>
+                  </td>
+                  <td style="padding:12px 0;border-bottom:1px solid #f3f4f6;vertical-align:top;">
+                    <span style="font-size:15px;font-weight:700;color:#111827;">{{TIPO}}</span>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding:12px 0;border-bottom:1px solid #f3f4f6;vertical-align:top;">
+                    <span style="font-size:13px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;">Área</span>
+                  </td>
+                  <td style="padding:12px 0;border-bottom:1px solid #f3f4f6;vertical-align:top;">
+                    <span style="font-size:15px;font-weight:700;color:#111827;">{{AREA}}</span>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding:12px 0;border-bottom:1px solid #f3f4f6;vertical-align:top;">
+                    <span style="font-size:13px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;">Riesgo</span>
+                  </td>
+                  <td style="padding:12px 0;border-bottom:1px solid #f3f4f6;vertical-align:top;">
+                    <span style="background:#fef2f2;color:#991b1b;font-size:13px;font-weight:800;padding:4px 12px;border-radius:20px;text-transform:uppercase;">
+                      🔴 ALTO
+                    </span>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding:12px 0;border-bottom:1px solid #f3f4f6;vertical-align:top;">
+                    <span style="font-size:13px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;">Ubicación</span>
+                  </td>
+                  <td style="padding:12px 0;border-bottom:1px solid #f3f4f6;vertical-align:top;">
+                    <span style="font-size:15px;font-weight:700;color:#111827;">{{UBICACION}}</span>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding:12px 0;border-bottom:1px solid #f3f4f6;vertical-align:top;">
+                    <span style="font-size:13px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;">Reportado por</span>
+                  </td>
+                  <td style="padding:12px 0;border-bottom:1px solid #f3f4f6;vertical-align:top;">
+                    <span style="font-size:15px;font-weight:700;color:#111827;">{{OPERARIO}}</span>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding:12px 0;vertical-align:top;">
+                    <span style="font-size:13px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;">Estado</span>
+                  </td>
+                  <td style="padding:12px 0;vertical-align:top;">
+                    <span style="font-size:14px;font-weight:600;color:#111827;">{{RESUELTO}}</span>
+                  </td>
+                </tr>
+
+              </table>
+
+              <!-- Descripción -->
+              <div style="background:#f9fafb;border-left:4px solid #e74c3c;border-radius:0 8px 8px 0;padding:16px 18px;margin-bottom:28px;">
+                <div style="font-size:12px;color:#6b7280;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Descripción del incidente</div>
+                <div style="font-size:16px;color:#111827;line-height:1.6;font-weight:500;">{{DESCRIPCION}}</div>
+              </div>
+
+              <!-- Acciones recomendadas -->
+              <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:20px;margin-bottom:28px;">
+                <h3 style="margin:0 0 16px;font-size:15px;color:#9a3412;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;">
+                  ⚡ Acciones recomendadas
+                </h3>
+
+                <table width="100%" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td style="padding:10px 0;border-bottom:1px solid #fed7aa;vertical-align:top;width:28%;">
+                      <span style="font-size:12px;font-weight:700;color:#9a3412;background:#fef3c7;padding:3px 8px;border-radius:4px;">INMEDIATA</span>
+                    </td>
+                    <td style="padding:10px 0 10px 12px;border-bottom:1px solid #fed7aa;font-size:14px;color:#1f2937;line-height:1.5;">
+                      {{ACCION_INMEDIATA}}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding:10px 0;border-bottom:1px solid #fed7aa;vertical-align:top;">
+                      <span style="font-size:12px;font-weight:700;color:#9a3412;background:#fef3c7;padding:3px 8px;border-radius:4px;">CORRECTIVA</span>
+                    </td>
+                    <td style="padding:10px 0 10px 12px;border-bottom:1px solid #fed7aa;font-size:14px;color:#1f2937;line-height:1.5;">
+                      {{ACCION_CORRECTIVA}}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding:10px 0;vertical-align:top;">
+                      <span style="font-size:12px;font-weight:700;color:#9a3412;background:#fef3c7;padding:3px 8px;border-radius:4px;">PREVENTIVA</span>
+                    </td>
+                    <td style="padding:10px 0 10px 12px;font-size:14px;color:#1f2937;line-height:1.5;">
+                      {{ACCION_PREVENTIVA}}
+                    </td>
+                  </tr>
+                </table>
+              </div>
+
+              <!-- Recordatorio -->
+              <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:14px 16px;font-size:13px;color:#166534;line-height:1.5;">
+                <strong>Recordatorio:</strong> Este reporte debe quedar cerrado con sus acciones documentadas en el sistema HSE. Riesgo ALTO requiere cierre en menos de 24 horas.
+              </div>
+
+            </td>
+          </tr>
+
+          <!-- PIE -->
+          <tr>
+            <td style="background:#1a1a2e;border-radius:0 0 12px 12px;padding:20px 32px;text-align:center;">
+              <p style="color:rgba(255,255,255,0.6);font-size:12px;margin:0;line-height:1.6;">
+                🛡️ <strong style="color:white;">HSE Reporter</strong> — Central Térmica Diésel<br>
+                Este es un mensaje automático. No responder a este correo.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

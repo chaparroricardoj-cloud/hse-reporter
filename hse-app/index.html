@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1a1a2e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="HSE Reporter">
+  <link rel="manifest" href="manifest.json">
+  <title>HSE Reporter — Central Térmica</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ══════════════════════════════════════════════════════
+       PANTALLA 1 — HOME
+  ══════════════════════════════════════════════════════ -->
+  <div id="screen-home" class="screen active">
+    <div id="offline-banner" class="offline-banner">
+      📵 Sin conexión — el reporte se guardará localmente
+    </div>
+
+    <div class="header">
+      <span class="logo">🛡️</span>
+      <div>
+        <h1>HSE Reporter</h1>
+        <span class="subtitle">Central Térmica Diésel</span>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="number" id="stat-today">0</div>
+          <div class="label">Reportes hoy</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" id="stat-total">0</div>
+          <div class="label">Total registros</div>
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="startReport()">
+        ⚠️&nbsp; REPORTAR AHORA
+      </button>
+
+      <div class="section-label" style="margin-top:28px">Últimos reportes</div>
+      <div id="recent-list"></div>
+    </div>
+
+    <div class="bottom-safe"></div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════
+       PANTALLA 2 — TIPO
+  ══════════════════════════════════════════════════════ -->
+  <div id="screen-type" class="screen">
+    <div class="progress-bar">
+      <div class="progress-fill" style="width:25%"></div>
+    </div>
+    <div class="header">
+      <button class="back-btn" onclick="showScreen('home')">←</button>
+      <h1>¿Qué vas a reportar?</h1>
+      <span class="step">Paso 1 / 4</span>
+    </div>
+
+    <div class="content">
+      <div class="section-label">Seleccioná el tipo de reporte</div>
+      <div class="type-grid">
+        <button class="type-btn" onclick="selectType('acto', this)">
+          <span class="icon">🚷</span>
+          <span class="title">Acto Inseguro</span>
+          <span class="subtitle">Lo hizo una persona</span>
+        </button>
+        <button class="type-btn" onclick="selectType('condicion', this)">
+          <span class="icon">⚠️</span>
+          <span class="title">Condición Insegura</span>
+          <span class="subtitle">Lo encontré así</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="bottom-safe"></div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════
+       PANTALLA 3 — ÁREA
+  ══════════════════════════════════════════════════════ -->
+  <div id="screen-area" class="screen">
+    <div class="progress-bar">
+      <div class="progress-fill" style="width:50%"></div>
+    </div>
+    <div class="header">
+      <button class="back-btn" onclick="showScreen('type')">←</button>
+      <h1>¿En qué área?</h1>
+      <span class="step">Paso 2 / 4</span>
+    </div>
+
+    <div class="content">
+      <div class="section-label">Seleccioná dónde ocurrió</div>
+      <div class="area-grid">
+        <button class="area-btn" onclick="selectArea('generacion', this)">
+          <span class="icon">⚙️</span>
+          <span class="label">Generación</span>
+        </button>
+        <button class="area-btn" onclick="selectArea('combustible', this)">
+          <span class="icon">🛢️</span>
+          <span class="label">Combustible</span>
+        </button>
+        <button class="area-btn" onclick="selectArea('electrico', this)">
+          <span class="icon">⚡</span>
+          <span class="label">Eléctrico</span>
+        </button>
+        <button class="area-btn" onclick="selectArea('taller', this)">
+          <span class="icon">🔧</span>
+          <span class="label">Taller</span>
+        </button>
+        <button class="area-btn area-btn-full" onclick="selectArea('predio', this)">
+          <span class="icon">🏭</span>
+          <span class="label">Predio / Exterior</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="bottom-safe"></div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════
+       PANTALLA 4 — DESCRIPCIÓN
+  ══════════════════════════════════════════════════════ -->
+  <div id="screen-description" class="screen">
+    <div class="progress-bar">
+      <div class="progress-fill" style="width:75%"></div>
+    </div>
+    <div class="header">
+      <button class="back-btn" onclick="showScreen('area')">←</button>
+      <h1>¿Qué pasó?</h1>
+      <span class="step">Paso 3 / 4</span>
+    </div>
+
+    <div id="loto-warning" class="warning-box" style="display:none;">
+      ⚡&nbsp; <div><strong>Área Eléctrica:</strong> Si hay trabajo en curso, verificá que se aplicó bloqueo LOTO antes de continuar.</div>
+    </div>
+
+    <div class="content">
+      <div class="section-label">Seleccioná o escribí qué pasó</div>
+      <div id="suggestions-container"></div>
+
+      <div id="custom-description" style="display:none; margin-top:4px;">
+        <textarea
+          id="desc-textarea"
+          class="textarea-field"
+          placeholder="Describí brevemente lo que viste…"
+          maxlength="280"
+          oninput="onDescInput(this)"
+        ></textarea>
+        <div class="char-count"><span id="char-count">0/280</span></div>
+      </div>
+
+      <div class="section-label">Ubicación exacta</div>
+      <input
+        type="text"
+        id="location-input"
+        class="input-field"
+        placeholder="Ej: Sala de máquinas, Tanque 2, Taller norte"
+        oninput="checkDescriptionValid()"
+      >
+
+      <div class="section-label">Foto</div>
+      <label id="photo-btn-label" class="photo-btn" for="photo-input">
+        📷&nbsp; Adjuntar foto
+      </label>
+      <input
+        type="file" id="photo-input"
+        accept="image/*" capture="environment"
+        style="display:none"
+        onchange="handlePhoto(this)"
+      >
+      <img id="photo-preview" class="photo-preview" alt="Foto del reporte">
+
+      <button id="btn-next-desc" class="btn-primary" style="margin-top:24px"
+              onclick="showScreen('risk')" disabled>
+        Continuar →
+      </button>
+    </div>
+
+    <div class="bottom-safe"></div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════
+       PANTALLA 5 — RIESGO + ENVÍO
+  ══════════════════════════════════════════════════════ -->
+  <div id="screen-risk" class="screen">
+    <div class="progress-bar">
+      <div class="progress-fill" style="width:100%"></div>
+    </div>
+
+    <div id="emergency-banner" class="emergency-banner">
+      🚨 RIESGO ALTO — Se notificará a supervisión inmediatamente
+    </div>
+
+    <div class="header">
+      <button class="back-btn" onclick="showScreen('description')">←</button>
+      <h1>Nivel de riesgo</h1>
+      <span class="step">Paso 4 / 4</span>
+    </div>
+
+    <div class="content">
+      <div class="section-label">¿Qué tan urgente es esto?</div>
+      <div class="risk-grid">
+        <button class="risk-btn bajo"  onclick="selectRisk('bajo')">
+          <span class="risk-icon">🟢</span>BAJO
+        </button>
+        <button class="risk-btn medio" onclick="selectRisk('medio')">
+          <span class="risk-icon">🟡</span>MEDIO
+        </button>
+        <button class="risk-btn alto"  onclick="selectRisk('alto')">
+          <span class="risk-icon">🔴</span>ALTO
+        </button>
+      </div>
+
+      <p id="photo-required-msg" class="photo-required-msg">
+        📷 Para riesgo ALTO se requiere adjuntar una foto
+      </p>
+
+      <div class="toggle-container">
+        <span class="toggle-label">✅&nbsp; Resolví en el momento</span>
+        <label class="toggle">
+          <input type="checkbox" id="toggle-resolved">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <button id="btn-submit" class="btn-primary"
+              style="margin-top:24px; background:#2c3e50"
+              onclick="submitReport()" disabled>
+        📤&nbsp; ENVIAR REPORTE
+      </button>
+    </div>
+
+    <div class="bottom-safe"></div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════
+       PANTALLA 6 — ÉXITO
+  ══════════════════════════════════════════════════════ -->
+  <div id="screen-success" class="screen">
+    <div class="header" style="background:#27ae60; justify-content:center;">
+      <h1>Reporte enviado</h1>
+    </div>
+
+    <div class="content">
+      <div class="success-icon">✅</div>
+      <div class="success-title">¡Reporte registrado!</div>
+      <div class="success-code" id="success-id">#HSE-XXXXXX</div>
+
+      <div class="report-summary">
+        <div class="summary-row">
+          <span class="key">Tipo</span>
+          <span class="value" id="sum-tipo">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="key">Área</span>
+          <span class="value" id="sum-area">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="key">Riesgo</span>
+          <span class="value" id="sum-riesgo">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="key">Descripción</span>
+          <span class="value" id="sum-desc">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="key">Ubicación</span>
+          <span class="value" id="sum-ubicacion">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="key">Resuelto</span>
+          <span class="value" id="sum-resuelto">—</span>
+        </div>
+      </div>
+
+      <button class="btn-primary" style="margin-top:24px" onclick="newReport()">
+        + Nuevo reporte
+      </button>
+      <button class="link-btn" onclick="showScreen('home'); renderHome();">
+        Volver al inicio
+      </button>
+    </div>
+
+    <div class="bottom-safe"></div>
+  </div>
+
+</div><!-- #app -->
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

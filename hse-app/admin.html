@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HSE Reporter — Panel de Administración</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════
+     NAVBAR
+══════════════════════════════════════════════════════ -->
+<nav class="navbar">
+  <a class="brand" href="/admin">
+    <span>🛡️</span> HSE Reporter
+  </a>
+  <div class="nav-links">
+    <a class="nav-link active" id="nav-reportes" href="#" onclick="showSection('reportes'); return false;">
+      📋 Reportes
+    </a>
+    <a class="nav-link" id="nav-stats" href="#" onclick="showSection('stats'); return false;">
+      📊 Estadísticas
+    </a>
+  </div>
+  <div class="right">
+    <a class="btn-app-link" href="/" target="_blank">
+      📱 Abrir App
+    </a>
+  </div>
+</nav>
+
+
+<!-- ══════════════════════════════════════════════════════
+     SECCIÓN: REPORTES
+══════════════════════════════════════════════════════ -->
+<div class="page">
+<div id="sec-reportes" class="section active">
+
+  <!-- Stat cards -->
+  <div class="stat-grid">
+    <div class="stat-card total">
+      <span class="icon">📋</span>
+      <div class="info">
+        <div class="num" id="s-total">0</div>
+        <div class="lbl">Total reportes</div>
+      </div>
+    </div>
+    <div class="stat-card alto" onclick="filterByRisk('alto')" title="Filtrar por ALTO">
+      <span class="icon">🔴</span>
+      <div class="info">
+        <div class="num" id="s-alto">0</div>
+        <div class="lbl">Riesgo ALTO</div>
+      </div>
+    </div>
+    <div class="stat-card medio" onclick="filterByRisk('medio')" title="Filtrar por MEDIO">
+      <span class="icon">🟡</span>
+      <div class="info">
+        <div class="num" id="s-medio">0</div>
+        <div class="lbl">Riesgo MEDIO</div>
+      </div>
+    </div>
+    <div class="stat-card bajo" onclick="filterByRisk('bajo')" title="Filtrar por BAJO">
+      <span class="icon">🟢</span>
+      <div class="info">
+        <div class="num" id="s-bajo">0</div>
+        <div class="lbl">Riesgo BAJO</div>
+      </div>
+    </div>
+    <div class="stat-card pend">
+      <span class="icon">⏳</span>
+      <div class="info">
+        <div class="num" id="s-pend">0</div>
+        <div class="lbl">Pendientes</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <select id="fil-area" onchange="onFilter('area', this.value)">
+      <option value="">Todas las áreas</option>
+      <option value="generacion">⚙️ Generación</option>
+      <option value="combustible">🛢️ Combustible</option>
+      <option value="electrico">⚡ Eléctrico</option>
+      <option value="taller">🔧 Taller</option>
+      <option value="predio">🏭 Predio</option>
+    </select>
+
+    <select id="fil-riesgo" onchange="onFilter('riesgo', this.value)">
+      <option value="">Todos los riesgos</option>
+      <option value="alto">🔴 ALTO</option>
+      <option value="medio">🟡 MEDIO</option>
+      <option value="bajo">🟢 BAJO</option>
+    </select>
+
+    <select onchange="onFilter('estado', this.value)">
+      <option value="">Todos los estados</option>
+      <option value="pendiente">Pendiente</option>
+      <option value="en_curso">En curso</option>
+      <option value="cerrado">Cerrado</option>
+    </select>
+
+    <input
+      type="search"
+      placeholder="🔍 Buscar por descripción, ubicación, ID…"
+      oninput="onFilter('q', this.value)"
+    >
+
+    <button class="btn-export" onclick="exportCSV()">
+      ⬇️ Exportar CSV
+    </button>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Tipo</th>
+          <th>Área</th>
+          <th>Descripción</th>
+          <th>Ubicación</th>
+          <th>Riesgo</th>
+          <th>Estado</th>
+          <th>Fecha / Hora</th>
+        </tr>
+      </thead>
+      <tbody id="report-tbody">
+        <tr><td colspan="8">
+          <div class="empty-state">
+            <div class="empty-icon">⏳</div>
+            <div>Cargando reportes…</div>
+          </div>
+        </td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div><!-- #sec-reportes -->
+
+
+<!-- ══════════════════════════════════════════════════════
+     SECCIÓN: ESTADÍSTICAS
+══════════════════════════════════════════════════════ -->
+<div id="sec-stats" class="section">
+  <div class="chart-grid">
+    <div class="chart-card">
+      <h3>Reportes por área</h3>
+      <div id="chart-areas"></div>
+    </div>
+    <div class="chart-card">
+      <h3>Distribución por riesgo</h3>
+      <div id="chart-riesgo"></div>
+    </div>
+    <div class="chart-card">
+      <h3>Tipo de reporte</h3>
+      <div id="chart-tipos"></div>
+    </div>
+    <div class="chart-card">
+      <h3>Estado de cierre</h3>
+      <div id="chart-estado"></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- .page -->
+
+
+<!-- ══════════════════════════════════════════════════════
+     MODAL — DETALLE DEL REPORTE
+══════════════════════════════════════════════════════ -->
+<div id="modal" class="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+
+    <div class="modal-header">
+      <h2>Reporte <span id="m-id" style="color:#e8640c"></span></h2>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Datos principales -->
+      <div class="m-section">
+        <div class="m-label">Información del reporte</div>
+        <div class="m-grid-2">
+          <div class="m-field">
+            <span class="key">Tipo</span>
+            <span class="val" id="m-tipo">—</span>
+          </div>
+          <div class="m-field">
+            <span class="key">Área</span>
+            <span class="val" id="m-area">—</span>
+          </div>
+          <div class="m-field">
+            <span class="key">Riesgo</span>
+            <span class="val"><span class="badge" id="m-riesgo">—</span></span>
+          </div>
+          <div class="m-field">
+            <span class="key">Resuelto en el momento</span>
+            <span class="val" id="m-resuelto">—</span>
+          </div>
+          <div class="m-field">
+            <span class="key">Operario</span>
+            <span class="val" id="m-operario">—</span>
+          </div>
+          <div class="m-field">
+            <span class="key">Fecha y hora</span>
+            <span class="val" id="m-fecha">—</span>
+          </div>
+          <div class="m-field" style="grid-column:1/-1">
+            <span class="key">Ubicación exacta</span>
+            <span class="val" id="m-ubicacion">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Descripción -->
+      <div class="m-section">
+        <div class="m-label">Descripción</div>
+        <div class="m-desc-box" id="m-desc">—</div>
+      </div>
+
+      <!-- Foto -->
+      <div class="m-section" id="m-photo-wrap" style="display:none">
+        <div class="m-label">Foto adjunta</div>
+        <img id="m-photo" class="m-photo" alt="Foto del reporte">
+      </div>
+
+      <!-- Acciones -->
+      <div class="m-section">
+        <div class="m-label">Acciones (editar y guardar)</div>
+        <div class="accion-block">
+          <span class="accion-tag">Inmediata</span>
+          <textarea id="m-accion-inm" placeholder="Acción inmediata…"></textarea>
+        </div>
+        <div class="accion-block">
+          <span class="accion-tag">Correctiva</span>
+          <textarea id="m-accion-cor" placeholder="Acción correctiva…"></textarea>
+        </div>
+        <div class="accion-block">
+          <span class="accion-tag">Preventiva</span>
+          <textarea id="m-accion-pre" placeholder="Acción preventiva…"></textarea>
+        </div>
+      </div>
+
+      <!-- Estado -->
+      <div class="m-section">
+        <div class="m-label">Estado del reporte</div>
+        <select id="m-estado" class="status-select">
+          <option value="pendiente">⏳ Pendiente</option>
+          <option value="en_curso">🔄 En curso</option>
+          <option value="cerrado">✅ Cerrado</option>
+        </select>
+      </div>
+
+    </div><!-- modal-body -->
+
+    <div class="modal-footer">
+      <button id="btn-close-report" class="btn-close-report" onclick="closeReport()">
+        ✅ Cerrar reporte
+      </button>
+      <button class="btn-save" onclick="saveModal()">
+        💾 Guardar cambios
+      </button>
+    </div>
+
+  </div><!-- .modal -->
+</div><!-- modal-overlay -->
+
+
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
+
+<script src="config.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

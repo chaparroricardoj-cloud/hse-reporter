@@ -1,0 +1,12 @@
+{
+  "name": "hse-reporter",
+  "version": "1.0.0",
+  "description": "App de reporte HSE para central térmica diésel",
+  "dependencies": {
+    "@capacitor/android": "6.1.2",
+    "@capacitor/core": "6.1.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "6.1.2"
+  }
+}

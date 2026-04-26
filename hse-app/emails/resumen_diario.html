@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Resumen Diario HSE — {{FECHA}}</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f2f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;">
+
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0f2f5;padding:30px 0;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+
+          <!-- ENCABEZADO -->
+          <tr>
+            <td style="background:#1a1a2e;border-radius:12px 12px 0 0;padding:28px 32px;text-align:center;">
+              <div style="font-size:40px;margin-bottom:8px;">🛡️</div>
+              <h1 style="color:white;margin:0;font-size:22px;font-weight:800;">Resumen Diario HSE</h1>
+              <p style="color:rgba(255,255,255,0.7);margin:8px 0 0;font-size:14px;">{{FECHA}}</p>
+            </td>
+          </tr>
+
+          <!-- TOTALES -->
+          <tr>
+            <td style="background:white;padding:28px 32px 0;">
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="center" style="background:#f9fafb;border-radius:10px;padding:18px;width:32%;">
+                    <div style="font-size:36px;font-weight:800;color:#e8640c;">{{TOTAL}}</div>
+                    <div style="font-size:12px;color:#6b7280;margin-top:4px;">Total reportes</div>
+                  </td>
+                  <td width="2%"></td>
+                  <td align="center" style="background:#fef2f2;border-radius:10px;padding:18px;width:32%;">
+                    <div style="font-size:36px;font-weight:800;color:#e74c3c;">{{ALTO}}</div>
+                    <div style="font-size:12px;color:#6b7280;margin-top:4px;">🔴 Riesgo ALTO</div>
+                  </td>
+                  <td width="2%"></td>
+                  <td align="center" style="background:#fffbeb;border-radius:10px;padding:18px;width:32%;">
+                    <div style="font-size:36px;font-weight:800;color:#f39c12;">{{MEDIO}}</div>
+                    <div style="font-size:12px;color:#6b7280;margin-top:4px;">🟡 Riesgo MEDIO</div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- DETALLE POR ÁREA -->
+          <tr>
+            <td style="background:white;padding:24px 32px 28px;">
+              <h3 style="font-size:13px;color:#6b7280;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin:0 0 16px;">
+                Detalle por área
+              </h3>
+              {{TABLA_AREAS}}
+            </td>
+          </tr>
+
+          <!-- REPORTES PENDIENTES -->
+          <tr>
+            <td style="background:#fff7ed;border-top:1px solid #fed7aa;padding:20px 32px;">
+              <h3 style="font-size:13px;color:#9a3412;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin:0 0 12px;">
+                ⏳ Reportes pendientes de cierre
+              </h3>
+              <p style="font-size:32px;font-weight:800;color:#e74c3c;margin:0;">{{PENDIENTES}}</p>
+              <p style="font-size:13px;color:#9a3412;margin:6px 0 0;">
+                Los reportes de riesgo ALTO deben cerrarse en menos de 24 hs.
+              </p>
+            </td>
+          </tr>
+
+          <!-- PIE -->
+          <tr>
+            <td style="background:#1a1a2e;border-radius:0 0 12px 12px;padding:18px 32px;text-align:center;">
+              <p style="color:rgba(255,255,255,0.6);font-size:12px;margin:0;line-height:1.6;">
+                🛡️ <strong style="color:white;">HSE Reporter</strong> — Central Térmica Diésel<br>
+                Resumen generado automáticamente. No responder a este correo.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

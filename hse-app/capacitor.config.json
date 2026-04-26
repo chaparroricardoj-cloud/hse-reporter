@@ -1,0 +1,17 @@
+{
+  "appId": "com.centratermica.hse",
+  "appName": "HSE Reporter",
+  "webDir": ".",
+  "android": {
+    "allowMixedContent": true,
+    "webContentsDebuggingEnabled": false,
+    "backgroundColor": "#1a1a2e"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1500,
+      "backgroundColor": "#1a1a2e",
+      "showSpinner": false
+    }
+  }
+}
