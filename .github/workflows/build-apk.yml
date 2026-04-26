@@ -20,96 +20,57 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
         with:
-          node-version: '20'
+          gradle-version: '8.4'
 
-      - name: Install Capacitor dependencies
-        working-directory: hse-app
-        run: npm install
+      - name: Build Debug APK
+        working-directory: hse-app/android-app
+        run: gradle assembleDebug
 
-      # Copiar la plantilla Android directamente desde el paquete instalado
-      # (evita usar "cap add android" que falla en entornos CI sin TTY)
-      - name: Setup Android platform
-        working-directory: hse-app
+      - name: Prepare version info
+        id: ver
         run: |
-          cp -r node_modules/@capacitor/android/android ./android
-
-          # Inyectar App ID en build.gradle
-          sed -i 's/applicationId "io.ionic.starter"/applicationId "com.centratermica.hse"/' \
-            android/app/build.gradle
-
-          # Inyectar nombre de la app en strings.xml
-          sed -i 's/<string name="app_name">.*<\/string>/<string name="app_name">HSE Reporter<\/string>/' \
-            android/app/src/main/res/values/strings.xml
-
-      # Permitir tráfico HTTP a la IP del servidor (sin HTTPS)
-      - name: Configure HTTP cleartext traffic
-        working-directory: hse-app/android/app/src/main
-        run: |
-          mkdir -p res/xml
-          cat > res/xml/network_security_config.xml << 'XMLEOF'
-          <?xml version="1.0" encoding="utf-8"?>
-          <network-security-config>
-              <base-config cleartextTrafficPermitted="true">
-                  <trust-anchors>
-                      <certificates src="system"/>
-                  </trust-anchors>
-              </base-config>
-          </network-security-config>
-          XMLEOF
-          sed -i 's/<application/<application android:networkSecurityConfig="@xml\/network_security_config"/' \
-            AndroidManifest.xml
-
-      # Sincronizar archivos web (HTML/CSS/JS) al proyecto Android
-      - name: Sync web assets
-        working-directory: hse-app
-        run: |
-          ./node_modules/.bin/cap sync android
-        env:
-          CI: true
-
-      - name: Build APK
-        working-directory: hse-app/android
-        run: |
-          chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon --stacktrace
+          TAG="${{ github.ref_name }}"
+          if [[ "$TAG" == v* ]]; then
+            VERSION="$TAG"
+          else
+            VERSION="dev-$(date +%Y%m%d-%H%M)"
+          fi
+          FILENAME="HSE-Reporter-${VERSION}.apk"
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "filename=${FILENAME}" >> $GITHUB_OUTPUT
 
       - name: Rename APK
         run: |
-          VERSION="${{ github.ref_name }}"
-          if [ -z "$VERSION" ] || [[ "$VERSION" == refs/* ]]; then
-            VERSION="dev-$(date +%Y%m%d-%H%M)"
-          fi
-          cp hse-app/android/app/build/outputs/apk/debug/app-debug.apk \
-             "HSE-Reporter-${VERSION}.apk"
-          echo "APK_NAME=HSE-Reporter-${VERSION}.apk" >> $GITHUB_ENV
+          cp hse-app/android-app/app/build/outputs/apk/debug/app-debug.apk \
+             "${{ steps.ver.outputs.filename }}"
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.APK_NAME }}
-          path: ${{ env.APK_NAME }}
+          name: ${{ steps.ver.outputs.filename }}
+          path: ${{ steps.ver.outputs.filename }}
           retention-days: 30
 
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          name: HSE Reporter ${{ github.ref_name }}
+          name: HSE Reporter ${{ steps.ver.outputs.version }}
           body: |
-            ## HSE Reporter ${{ github.ref_name }}
+            ## HSE Reporter ${{ steps.ver.outputs.version }}
 
             ### Instalación en Android
-            1. Descargá el archivo **${{ env.APK_NAME }}**
+            1. Descargá el archivo **${{ steps.ver.outputs.filename }}**
             2. En el celular: Ajustes → Seguridad → Permitir fuentes desconocidas
-            3. Abrí el APK descargado y tocá Instalar
+            3. Abrí el APK y tocá Instalar
 
             ### Requisitos
-            - Android 7.0 o superior
+            - Android 5.0 o superior
             - Conectado a la red WiFi de la central térmica
-          files: ${{ env.APK_NAME }}
+          files: ${{ steps.ver.outputs.filename }}
           draft: false
           prerelease: false
         env:
