@@ -1,11 +1,9 @@
 name: Build APK
 
 on:
-  # Se ejecuta cuando subís un tag tipo "v1.0.0" → crea Release con el APK
   push:
     tags:
       - 'v*'
-  # También se puede lanzar manualmente desde GitHub → Actions → Run workflow
   workflow_dispatch:
 
 jobs:
@@ -13,81 +11,81 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Descargar el código
       - name: Checkout
         uses: actions/checkout@v4
 
-      # 2. Java 17 (necesario para Gradle / Android)
       - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # 3. Node.js 20 (necesario para Capacitor)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: hse-app/package.json
 
-      # 4. Instalar Capacitor
-      - name: Install Capacitor
+      - name: Install Capacitor dependencies
         working-directory: hse-app
         run: npm install
 
-      # 5. Crear proyecto Android (solo si no existe en el repo)
-      - name: Add Android platform
+      # Copiar la plantilla Android directamente desde el paquete instalado
+      # (evita usar "cap add android" que falla en entornos CI sin TTY)
+      - name: Setup Android platform
         working-directory: hse-app
         run: |
-          if [ ! -d "android" ]; then
-            npx cap add android
-          fi
+          cp -r node_modules/@capacitor/android/android ./android
 
-      # 6. Permitir HTTP al servidor (necesario para conectar a IP sin HTTPS)
+          # Inyectar App ID en build.gradle
+          sed -i 's/applicationId "io.ionic.starter"/applicationId "com.centratermica.hse"/' \
+            android/app/build.gradle
+
+          # Inyectar nombre de la app en strings.xml
+          sed -i 's/<string name="app_name">.*<\/string>/<string name="app_name">HSE Reporter<\/string>/' \
+            android/app/src/main/res/values/strings.xml
+
+      # Permitir tráfico HTTP a la IP del servidor (sin HTTPS)
       - name: Configure HTTP cleartext traffic
         working-directory: hse-app/android/app/src/main
         run: |
           mkdir -p res/xml
-          cat > res/xml/network_security_config.xml << 'EOF'
+          cat > res/xml/network_security_config.xml << 'XMLEOF'
           <?xml version="1.0" encoding="utf-8"?>
           <network-security-config>
               <base-config cleartextTrafficPermitted="true">
                   <trust-anchors>
-                      <certificates src="system" />
+                      <certificates src="system"/>
                   </trust-anchors>
               </base-config>
           </network-security-config>
-          EOF
+          XMLEOF
+          sed -i 's/<application/<application android:networkSecurityConfig="@xml\/network_security_config"/' \
+            AndroidManifest.xml
 
-          # Agregar networkSecurityConfig al AndroidManifest.xml
-          sed -i 's|<application|<application android:networkSecurityConfig="@xml/network_security_config"|' AndroidManifest.xml
-
-      # 7. Sincronizar archivos web → Android
-      - name: Sync Capacitor
+      # Sincronizar archivos web (HTML/CSS/JS) al proyecto Android
+      - name: Sync web assets
         working-directory: hse-app
-        run: npx cap sync android
+        run: |
+          ./node_modules/.bin/cap sync android
+        env:
+          CI: true
 
-      # 8. Construir APK
       - name: Build APK
         working-directory: hse-app/android
         run: |
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
-      # 9. Renombrar APK con versión legible
       - name: Rename APK
         run: |
           VERSION="${{ github.ref_name }}"
-          if [ -z "$VERSION" ] || [ "$VERSION" = "refs/heads/main" ]; then
-            VERSION="dev-$(date +%Y%m%d)"
+          if [ -z "$VERSION" ] || [[ "$VERSION" == refs/* ]]; then
+            VERSION="dev-$(date +%Y%m%d-%H%M)"
           fi
           cp hse-app/android/app/build/outputs/apk/debug/app-debug.apk \
-             HSE-Reporter-${VERSION}.apk
+             "HSE-Reporter-${VERSION}.apk"
           echo "APK_NAME=HSE-Reporter-${VERSION}.apk" >> $GITHUB_ENV
 
-      # 10. Guardar APK como artefacto descargable (siempre)
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
@@ -95,7 +93,6 @@ jobs:
           path: ${{ env.APK_NAME }}
           retention-days: 30
 
-      # 11. Crear Release en GitHub (solo cuando se hace push de un tag v*)
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
@@ -111,7 +108,7 @@ jobs:
 
             ### Requisitos
             - Android 7.0 o superior
-            - Conexión WiFi a la red de la central (para acceder al servidor)
+            - Conectado a la red WiFi de la central térmica
           files: ${{ env.APK_NAME }}
           draft: false
           prerelease: false
