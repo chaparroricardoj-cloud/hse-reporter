@@ -20,6 +20,19 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      # Instalar plataforma Android 34 y build-tools
+      - name: Setup Android SDK
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
+            "platforms;android-34" \
+            "build-tools;34.0.0" \
+            --sdk_root=$ANDROID_HOME 2>/dev/null || true
+
+      # Apuntar Gradle al SDK del runner
+      - name: Create local.properties
+        working-directory: hse-app/android-app
+        run: echo "sdk.dir=$ANDROID_HOME" > local.properties
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
@@ -27,7 +40,7 @@ jobs:
 
       - name: Build Debug APK
         working-directory: hse-app/android-app
-        run: gradle assembleDebug
+        run: gradle assembleDebug --stacktrace
 
       - name: Prepare version info
         id: ver
@@ -38,9 +51,8 @@ jobs:
           else
             VERSION="dev-$(date +%Y%m%d-%H%M)"
           fi
-          FILENAME="HSE-Reporter-${VERSION}.apk"
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
-          echo "filename=${FILENAME}" >> $GITHUB_OUTPUT
+          echo "filename=HSE-Reporter-${VERSION}.apk" >> $GITHUB_OUTPUT
 
       - name: Rename APK
         run: |
